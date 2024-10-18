@@ -6,28 +6,29 @@ import cv2
 import os
 
 # 假设你已经有图片数据集，图片大小统一为64x64
-img_size = 64
+img_size = 500
 num_classes = 9  # 3种颜色 × 3种形状 = 9类
 
 # 加载图片数据并预处理
 def load_data(img_dir):
     images = []
     labels = []
-    for label, category in enumerate(os.listdir(img_dir)):
+    for label, category in enumerate(os.listdir(img_dir)): # label是类别，category是文件夹名
         category_path = os.path.join(img_dir, category)
         if os.path.isdir(category_path):
             for img_name in os.listdir(category_path):
                 img_path = os.path.join(category_path, img_name)
+                print(f'图片路径{img_path}')
                 img = cv2.imread(img_path)
                 img = cv2.resize(img, (img_size, img_size))
                 images.append(img)
-                labels.append(label)
+                labels.append(category) # 注意：这里的标签是类别名，文件夹名称已经代表了类别
     images = np.array(images) / 255.0  # 归一化
     labels = np.array(labels)
     return images, labels
 
 # 假设图片保存在 'data/' 文件夹下，每个子文件夹代表一种类别
-images, labels = load_data('data/')
+images, labels = load_data('./dataset/new_rotate2')
 
 # 划分训练集和测试集
 X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.2, random_state=42)
