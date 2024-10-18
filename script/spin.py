@@ -106,9 +106,7 @@ def rotate_triangle_0_120():
 
                         # 保存旋转后的图片
                         cv2.imwrite(os.path.join(save_folder, f'{filename.split(".")[0]}_rotated_{i}.{filename.split(".")[-1]}'), dst)
-
-
-
+                        
 rotate_square_0_90()
 rotate_triangle_0_120()                        
 print("图片筛选、旋转并保存完成。")
