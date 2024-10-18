@@ -1,5 +1,7 @@
 import os
 from PIL import Image, ImageOps, ImageFilter
+import cv2
+import numpy as np
 
 # 定义图片所在的文件夹路径和保存路径
 input_folder = './dataset/old'  # 替换为你的图片文件夹路径
@@ -28,33 +30,34 @@ def rotate_square_0_90():
             for filename in files:
                 if filename.endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff')):
                     img_path = os.path.join(root, filename)
-                    img = Image.open(img_path).convert('RGBA')
-
+                    # img = Image.open(img_path).convert('RGBA')
+                    src = cv2.imread(img_path)
                     # 旋转0-90度并保存
                     for i in range(0, 90):
-                        rotated_img = img.rotate(i, expand=True, fillcolor=None)
-                        # 提取边缘颜色用于填充
-                        width, height = rotated_img.size
-                        left_edge = rotated_img.crop((0, 0, 1, height)).resize((50, height))  # 左边扩展
-                        right_edge = rotated_img.crop((width - 1, 0, width, height)).resize((50, height))  # 右边扩展
-                        top_edge = rotated_img.crop((0, 0, width, 1)).resize((width, 50))  # 上边扩展
-                        bottom_edge = rotated_img.crop((0, height - 1, width, height)).resize((width, 50))  # 下边扩展
+                        # 获取原图尺寸
+                        (h, w) = src.shape[:2]
 
-                        # 创建新图像用于放置扩展部分
-                        expanded_width = width + 100
-                        expanded_height = height + 100
-                        expanded_img = Image.new('RGB', (expanded_width, expanded_height))
+                        # 计算旋转后图像的尺寸
+                        # 计算旋转矩阵
+                        rot_mat = cv2.getRotationMatrix2D((w / 2, h / 2), i, 1.0)
+                        cos = np.abs(rot_mat[0, 0])
+                        sin = np.abs(rot_mat[0, 1])
 
-                        # 填充扩展部分
-                        expanded_img.paste(top_edge, (50, 0))  # 上部扩展
-                        expanded_img.paste(bottom_edge, (50, height + 50))  # 下部扩展
-                        expanded_img.paste(left_edge, (0, 50))  # 左部扩展
-                        expanded_img.paste(right_edge, (width + 50, 50))  # 右部扩展
-                        
-                        # 将旋转后的图像放置在中心
-                        expanded_img.paste(rotated_img, (50, 50), rotated_img)
+                        # 计算新的宽和高
+                        new_w = int((h * sin) + (w * cos))
+                        new_h = int((h * cos) + (w * sin))
 
-                        expanded_img.save(os.path.join(save_folder, f'{filename.split(".")[0]}_rotated_{i}.{filename.split(".")[-1]}'))
+                        # 调整旋转矩阵以考虑新的尺寸
+                        rot_mat[0, 2] += new_w / 2 - w / 2
+                        rot_mat[1, 2] += new_h / 2 - h / 2
+
+                        # 使用BORDER_REFLECT将黑边填充为边缘颜色
+                        dst = cv2.warpAffine(src, rot_mat, (new_w, new_h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+
+                        # 保存旋转后的图片
+                        cv2.imwrite(os.path.join(save_folder, f'{filename.split(".")[0]}_rotated_{i}.{filename.split(".")[-1]}'), dst)
+
+
 
 # 三角形旋转0-120度
 def rotate_triangle_0_120():
@@ -78,16 +81,33 @@ def rotate_triangle_0_120():
             for filename in files:
                 if filename.endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff')):
                     img_path = os.path.join(root, filename)
-                    img = Image.open(img_path)
+                    src = cv2.imread(img_path)
+                    # 旋转0-90度并保存
+                    for i in range(0, 90):
+                        # 获取原图尺寸
+                        (h, w) = src.shape[:2]
 
-                    # 旋转0-119度并保存
-                    for i in range(0, 120):
-                        img_i = img.rotate(i, expand=True)
-                        # 提取图像的边缘像素，用于边界扩展的填充
-                        expanded_img = ImageOps.expand(img_i, border=expand_width, fill=0)
-                        # 将扩展部分应用模糊效果，创造自然的扩展边缘
-                        blurred_img = expanded_img.filter(ImageFilter.GaussianBlur(radius=expand_width // 2))
-                        blurred_img.save(os.path.join(save_folder, f'{filename.split(".")[0]}_rotated_{i}.{filename.split(".")[-1]}'))
+                        # 计算旋转后图像的尺寸
+                        # 计算旋转矩阵
+                        rot_mat = cv2.getRotationMatrix2D((w / 2, h / 2), i, 1.0)
+                        cos = np.abs(rot_mat[0, 0])
+                        sin = np.abs(rot_mat[0, 1])
+
+                        # 计算新的宽和高
+                        new_w = int((h * sin) + (w * cos))
+                        new_h = int((h * cos) + (w * sin))
+
+                        # 调整旋转矩阵以考虑新的尺寸
+                        rot_mat[0, 2] += new_w / 2 - w / 2
+                        rot_mat[1, 2] += new_h / 2 - h / 2
+
+                        # 使用BORDER_REFLECT将黑边填充为边缘颜色
+                        dst = cv2.warpAffine(src, rot_mat, (new_w, new_h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+
+                        # 保存旋转后的图片
+                        cv2.imwrite(os.path.join(save_folder, f'{filename.split(".")[0]}_rotated_{i}.{filename.split(".")[-1]}'), dst)
+
+
 
 rotate_square_0_90()
 rotate_triangle_0_120()                        
