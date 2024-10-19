@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片分类</title>
+</head>
+<body>
+    <h1>上传图片进行预测</h1>
+    <form action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*" required>
+        <input type="submit" value="确定">
+    </form>
+
+    {% if image_path %}
+        <h2>预测结果</h2>
+        <img src="{{ image_path }}" alt="Uploaded Image" style="max-width: 300px;">
+        <p>识别结果: {{ label }}</p>
+        <p>准确率: {{ confidence }}</p>
+    {% endif %}
+</body>
+</html>

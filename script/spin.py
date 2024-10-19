@@ -5,8 +5,9 @@ import numpy as np
 
 # 定义图片所在的文件夹路径和保存路径
 input_folder = './dataset/old'  # 替换为你的图片文件夹路径
-output_folder = './dataset/new_rotate2'  # 替换为你保存图片的文件夹路径
+output_folder = './dataset/new_rotate'  # 替换为你保存图片的文件夹路径
 expand_width = 0
+out_size = 500   # 输出图片大小
 
 # 正方形旋转0-90度
 def rotate_square_0_90():
@@ -20,7 +21,7 @@ def rotate_square_0_90():
         if keyword in os.path.basename(root):
             # 生成与当前子文件夹对应的输出文件夹路径
             relative_path = os.path.relpath(root, input_folder)
-            save_folder = os.path.join(output_folder, str(relative_path+'0-90'))
+            save_folder = os.path.join(output_folder, relative_path)
 
             # 创建对应的输出子文件夹（如果不存在的话）
             if not os.path.exists(save_folder):
@@ -54,6 +55,9 @@ def rotate_square_0_90():
                         # 使用BORDER_REFLECT将黑边填充为边缘颜色
                         dst = cv2.warpAffine(src, rot_mat, (new_w, new_h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
 
+                        # 重设图片大小
+                        dst = cv2.resize(dst, (out_size, out_size))
+
                         # 保存旋转后的图片
                         cv2.imwrite(os.path.join(save_folder, f'{filename.split(".")[0]}_rotated_{i}.{filename.split(".")[-1]}'), dst)
 
@@ -71,7 +75,7 @@ def rotate_triangle_0_120():
         if keyword in os.path.basename(root):
             # 生成与当前子文件夹对应的输出文件夹路径
             relative_path = os.path.relpath(root, input_folder)
-            save_folder = os.path.join(output_folder, str(relative_path+'0-120'))
+            save_folder = os.path.join(output_folder, relative_path)
 
             # 创建对应的输出子文件夹（如果不存在的话）
             if not os.path.exists(save_folder):
@@ -101,12 +105,14 @@ def rotate_triangle_0_120():
                         rot_mat[0, 2] += new_w / 2 - w / 2
                         rot_mat[1, 2] += new_h / 2 - h / 2
 
-                        # 使用BORDER_REFLECT将黑边填充为边缘颜色
+                        # BORDER_REPLICATE
                         dst = cv2.warpAffine(src, rot_mat, (new_w, new_h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+                        # 重设图片大小
+                        dst = cv2.resize(dst, (out_size, out_size))
 
                         # 保存旋转后的图片
                         cv2.imwrite(os.path.join(save_folder, f'{filename.split(".")[0]}_rotated_{i}.{filename.split(".")[-1]}'), dst)
-                        
+
 rotate_square_0_90()
 rotate_triangle_0_120()                        
 print("图片筛选、旋转并保存完成。")
