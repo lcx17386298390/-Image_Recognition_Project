@@ -1,0 +1,20 @@
+{
+    "blue_circle" : 0,
+    "blue_square" : 1,
+    "blue_triangle" : 2,
+    "red_circle" : 3,
+    "red_square" : 4,
+    "red_triangle" : 5,
+    "yellow_circle" : 6,
+    "yellow_square" : 7,
+    "yellow_triangle" : 8,
+    "0": "blue_circle",
+    "1": "blue_square",
+    "2": "blue_triangle",
+    "3": "red_circle",
+    "4": "red_square",
+    "5": "red_triangle",
+    "6": "yellow_circle",
+    "7": "yellow_square",
+    "8": "yellow_triangle"
+}
